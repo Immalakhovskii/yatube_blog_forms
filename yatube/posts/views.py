@@ -39,7 +39,7 @@ def group_posts(request, slug):
 
 def profile(request, username):
     template = "posts/profile.html"
-    user = get_object_or_404(User, username=username)
+    author = get_object_or_404(User, username=username)
     posts = Post.objects.filter(author__username=username)
     posts_count = Post.objects.filter(author__username=username).count()
     paginator = Paginator(posts, 10)
@@ -49,7 +49,7 @@ def profile(request, username):
         "page_obj": page_obj,
         "posts_count": posts_count,
         "posts": posts,
-        "user": user,
+        "author": author,
     }
     return render(request, template, context)
 
@@ -81,3 +81,24 @@ def post_create(request):
 
     form = PostForm()
     return render(request, template, {"form": form})
+
+
+@login_required
+def post_edit(request, post_id):
+    template = "posts/create_post.html"
+    post = get_object_or_404(Post, id=post_id)
+    if request.user == post.author:
+        form = PostForm(request.POST, instance=post)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect("posts:post_detail", post_id=post_id)
+
+        return render(request, template,
+                      {"post": post,
+                       "form": form,
+                       "is_edit": True})
+
+    return redirect("posts:post_detail", post_id=post_id)
