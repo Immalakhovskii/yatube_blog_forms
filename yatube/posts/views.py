@@ -5,14 +5,14 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .models import Group, Post
 from .forms import PostForm
 
-
+POSTS_PER_PAGE = 10
 User = get_user_model()
 
 
 def index(request):
     template = "posts/index.html"
     posts = Post.objects.all()
-    paginator = Paginator(posts, 10)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     context = {
@@ -26,7 +26,7 @@ def group_posts(request, slug):
     template = "posts/group_list.html"
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.all()
-    paginator = Paginator(posts, 10)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     context = {
@@ -41,7 +41,7 @@ def profile(request, username):
     template = "posts/profile.html"
     author = get_object_or_404(User, username=username)
     posts = Post.objects.filter(author__username=username)
-    posts_count = Post.objects.filter(author__username=username).count()
+    posts_count = posts.count()
     paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -68,16 +68,12 @@ def post_detail(request, post_id):
 @login_required
 def post_create(request):
     template = "posts/create_post.html"
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect("posts:profile", username=request.user)
-
-        return render(request, template, {"form": form})
+    form = PostForm(request.POST or None)
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        return redirect("posts:profile", username=request.user)
 
     form = PostForm()
     return render(request, template, {"form": form})
@@ -88,7 +84,7 @@ def post_edit(request, post_id):
     template = "posts/create_post.html"
     post = get_object_or_404(Post, id=post_id)
     if request.user == post.author:
-        form = PostForm(request.POST, instance=post)
+        form = PostForm(request.POST, instance=post or None)
 
         if form.is_valid():
             post = form.save(commit=False)
