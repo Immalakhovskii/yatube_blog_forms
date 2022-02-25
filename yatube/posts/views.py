@@ -75,7 +75,6 @@ def post_create(request):
         post.save()
         return redirect("posts:profile", username=request.user)
 
-    form = PostForm()
     return render(request, template, {"form": form})
 
 
@@ -85,7 +84,6 @@ def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user == post.author:
         form = PostForm(request.POST, instance=post or None)
-
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
