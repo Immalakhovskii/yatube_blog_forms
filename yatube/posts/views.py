@@ -6,8 +6,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .models import Group, Post
 from .forms import PostForm
 
-POSTS_PER_PAGE = 10
 User = get_user_model()
+
+POSTS_PER_PAGE = 10
 
 
 def index(request):

@@ -15,7 +15,7 @@ class PostModelTest(TestCase):
         cls.user = User.objects.create_user(username="auth")
         cls.group = Group.objects.create(
             title="Тестовая группа",
-            slug="Тестовый слаг",
+            slug="test_group",
             description="Тестовое описание",
         )
         cls.post = Post.objects.create(
@@ -23,7 +23,7 @@ class PostModelTest(TestCase):
             text="Тестовый пост длиннее 15 символов",
         )
 
-    def test_models_have_correct_object_names(self):
+    def test_models_have_correct_objects_names(self):
         """Проверка корректной работы __str__ в моделях."""
         group = PostModelTest.group
         post = PostModelTest.post
@@ -51,7 +51,7 @@ class PostModelTest(TestCase):
                 )
 
     def test_post_model_help_texts(self):
-        """help_texts в полях совпадают с ожидаемым."""
+        """Проверка совпадения help_texts в полях с ожидаемыми."""
         post = PostModelTest.post
         field_help_texts = {
             "text": "Введите текст поста",
