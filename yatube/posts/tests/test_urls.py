@@ -16,7 +16,6 @@ class PostURLTests(TestCase):
         cls.group = Group.objects.create(
             title="Тестовая группа",
             slug="test_group",
-            description="Тестовое описание",
         )
         cls.post = Post.objects.create(
             id=1,
@@ -42,7 +41,7 @@ class PostURLTests(TestCase):
                 response = self.guest_client.get(url)
                 self.assertEqual(response.status_code, status)
 
-    def test_posts_create_and_edit_urls_at_desired_location(self):
+    def test_posts_create_and_edit_urls_exist_at_desired_location(self):
         """Проверка доступных URL posts для авторизованных пользователей."""
         url_status = {
             "/create/": HTTPStatus.OK,
@@ -60,7 +59,7 @@ class PostURLTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_post_create_and_edit_redirect_anonymous(self):
-        """Проверка редиректов анонима с posts/create/ и posts/edit/."""
+        """Проверка редиректов анонима с create/ и posts/edit/."""
         response = self.guest_client.get("/create/", follow=True)
         self.assertRedirects(response, "/auth/login/?next=/create/")
         response = self.guest_client.get("/posts/1/edit/", follow=True)
