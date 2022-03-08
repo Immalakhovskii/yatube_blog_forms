@@ -8,6 +8,8 @@ from ..views import POSTS_PER_PAGE
 
 User = get_user_model()
 
+POSTS_FOR_TESTS = 13
+
 
 class PostViewsTests(TestCase):
     @classmethod
@@ -20,6 +22,7 @@ class PostViewsTests(TestCase):
         )
         cls.group2 = Group.objects.create(
             title="Тестовая группа 2",
+            slug="test_group2"
         )
         cls.post = Post.objects.create(
             id=1,
@@ -33,7 +36,7 @@ class PostViewsTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
-    def test_url_addresses_use_correct_templates(self):
+    def test_pages_use_correct_templates(self):
         """Проверка использования правильных шаблонов в URL-адресах."""
         page_names_templates = {
             reverse("posts:index"): "posts/index.html",
@@ -80,8 +83,8 @@ class PostViewsTests(TestCase):
         """Проверка принадлежности поста только своей группе."""
         response = self.guest_client.get(reverse("posts:group_list",
                                          kwargs={"slug": "test_group"}))
-        self.assertNotEqual(response.context.get("group").title,
-                            self.group2.title)
+        self.assertNotEqual(response.context.get("group").id,
+                            self.group2.id)
 
     def test_post_detail_shows_correct_context(self):
         """Проверка контекста шаблона post_detail"""
@@ -124,7 +127,7 @@ class PaginatorPostViewsTest(TestCase):
             title="Тестовая группа",
             slug="test_group",
         )
-        for i in range(0, (POSTS_PER_PAGE + 3)):
+        for i in range(0, (POSTS_FOR_TESTS)):
             cls.post = Post.objects.create(author=cls.user,
                                            group=cls.group)
 
@@ -149,10 +152,12 @@ class PaginatorPostViewsTest(TestCase):
     def test_second_pages_have_expected_number_of_records(self):
         """Проверка ожидаемого числа объектов на вторых страницах
         index, group_list и profile."""
+        posts_count = POSTS_FOR_TESTS - POSTS_PER_PAGE
         page_with_objects = {
-            reverse("posts:index"): 3,
-            reverse("posts:group_list", kwargs={"slug": "test_group"}): 3,
-            reverse("posts:profile", kwargs={"username": "auth"}): 3,
+            reverse("posts:index"): posts_count,
+            reverse("posts:group_list", kwargs={"slug": "test_group"}):
+            posts_count,
+            reverse("posts:profile", kwargs={"username": "auth"}): posts_count,
         }
         for page, objects in page_with_objects.items():
             with self.subTest(page=page):
