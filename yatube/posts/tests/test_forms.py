@@ -28,7 +28,8 @@ class PostFormTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
-    def test_post_create(self):
+    def test_post_creation_is_possible(self):
+        """Валидная форма создает запись в Post"""
         posts_count = Post.objects.count()
         form_data = {
             "text": "Вполне себе длинный тестовый пост",
@@ -50,19 +51,20 @@ class PostFormTests(TestCase):
             ).exists()
         )
 
-    def test_post_edit(self):
+    def test_post_editing_is_possible(self):
+        """Валидная форма изменяет запись в Post"""
         posts_count = Post.objects.count()
         form_data = {
             "text": "Вполне себе длинный тестовый пост с правками",
         }
         response = self.authorized_client.post(
-            reverse("posts:post_edit", kwargs={"post_id": 1}),
+            reverse("posts:post_edit", kwargs={"post_id": self.post.id}),
             data=form_data,
             follow=True,
         )
         self.assertRedirects(
             response, reverse("posts:post_detail",
-                              kwargs={"post_id": 1}))
+                              kwargs={"post_id": self.post.id}))
         self.assertEqual(Post.objects.count(), posts_count)
         self.assertTrue(
             Post.objects.filter(
