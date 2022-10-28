@@ -1,3 +1,2 @@
-# backend_community_homework
-
-[![CI](https://github.com/yandex-praktikum/hw03_forms/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw03_forms/actions/workflows/python-app.yml)
+# Blogging platform Yatube (Forms) #
+*This repository shows one of a major steps during creation blogging platform Yatube; this version has form for posts creation and edition (also there are a lot of small upgrades compared to the previous version). Check out final result and read detailed description of the project here: https://github.com/Immalakhovskii/yatube_blog_final*
